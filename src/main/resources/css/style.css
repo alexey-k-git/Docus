@@ -1,0 +1,20 @@
+table#resulttable {
+	border-collapse: collapse;
+	text-align: center;
+}
+/* Zebra striping */
+table#resulttable tr:nth-of-type(odd) {
+	background: #eee;
+}
+
+table#resulttable th {
+	background: #333;
+	color: white;
+	font-weight: bold;
+}
+
+table #resulttable td,th {
+	padding: 8px;
+	border: 1px solid black;
+	text-align: center;
+}

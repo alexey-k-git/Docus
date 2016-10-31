@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Class-Path: json-20090211.jar commons-fileupload-1.3.1.jar jetty-http-
+ 9.0.0.M5.jar spark-core-1.0.jar jetty-security-9.0.2.v20130417.jar je
+ tty-webapp-9.0.2.v20130417.jar freemarker-2.3.20.jar mongo-java-drive
+ r-2.10.1.jar jetty-io-9.0.0.M5.jar slf4j-api-1.7.2.jar commons-io-2.2
+ .jar jetty-xml-9.0.2.v20130417.jar javax.servlet-3.0.0.v201112011016.
+ jar jetty-servlet-9.0.2.v20130417.jar jetty-server-9.0.0.M5.jar jetty
+ -util-9.0.0.M5.jar
+Main-Class: ru.restfulrobot.docus.DocusFrame
+
