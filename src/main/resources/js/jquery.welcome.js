@@ -1,3 +1,4 @@
+// общие переменные
 var lastResult;
 var prevResult;
 var lastEvent;
@@ -10,6 +11,11 @@ var jump;
 var selectedNodes;
 var nodeSelector;
 
+/*
+Здесь список функций предназначенных для управления элементами страницы
+*/
+
+// функция для входа как незарегистрированный пользователь
 function enterHowUnregistred() {
 	сurrentUserRole = "unregistered";
 	userName = "unregistered";
@@ -19,6 +25,7 @@ function enterHowUnregistred() {
 	$("#welcomeText").html("");
 }
 
+// функция для сброса переменных
 function resetVariables() {
 	lastResult = "";
 	prevResult = "-";
@@ -28,6 +35,7 @@ function resetVariables() {
 	selectedNodes = [];
 }
 
+// функция для сброса доступности кнопок управления
 function resetButtons() {
 	document.docusControl.add.disabled = "disabled";
 	document.docusControl.del.disabled = "disabled";
@@ -40,6 +48,7 @@ function resetButtons() {
 	document.docusControl.removeFile.disabled = "disabled";
 }
 
+// рекурсивная функция которая находит и открывает нужный нам узел дерева зная путь к нему в виде id
 function getDocument(path) {
 	if (path.length == 0) {
 		return;
@@ -47,12 +56,10 @@ function getDocument(path) {
 		var treeId = "#" + path.shift();
 		if (path.length == 0) {
 			$("#tree-div").jstree("deselect_all");
-			// $("#tree-div").jstree("select_node", treeId);
 			selectedNodes.unshift(treeId);
 			nodeSelector = "li" + treeId + " " + "a"
 			$(nodeSelector).css("background", "yellow");
 			return;
-
 		}
 		$("#tree-div").jstree("open_node", treeId, function() {
 			getDocument(path);
@@ -73,6 +80,7 @@ function unique(arr) {
 
 }
 
+// функция определяет какие кнопки делать активными в зависимости от текущей команды пользователя (создать элемент или изменить текущий)
 function addOrChange() {
 	if (lastEvent == "Create") {
 		setButtonsSaveResetCancel(true, true, true);
@@ -82,6 +90,7 @@ function addOrChange() {
 	}
 }
 
+// функция проверки изменений в текущем документе
 function checkChanges() {
 	if (prevResult == "-" || jump) {
 		jump = false;
@@ -97,6 +106,7 @@ function checkChanges() {
 	}
 }
 
+// проверка полей документов на заполненость
 function checkFields() {
 
 	if (document.docusControl.docName.value == ""
@@ -109,7 +119,9 @@ function checkFields() {
 
 }
 
+// устаревшая функция заполнения формы документа
 function fillOutForm(docInformation) {
+    /*
 	var arrayParams = docInformation.split("{:-)}");
 	filterAccessibilityAddDeleteforUser(true, true);
 	document.docusControl.docName.disabled = "";
@@ -124,19 +136,24 @@ function fillOutForm(docInformation) {
 	}
 	document.docusControl.checkFile.checked = flag;
 	document.docusControl.docFileName.value = arrayParams[4];
+	*/
 }
 
+// функция для формирования таблицы с результатом поиска
 function createResultTable(data) {
-	var results = $('#result tbody');
-	results.empty();
-	if (data.size === 0) {
+var results = $("table#resulttable tbody");
+var array = eval('(' + data + ')');
+results.empty();
+	if (array.size <1) {
+    	$("#result").show();
 		results.append($("<tr><td colspan='5'>По вашему запросу ничего не найдено</td></tr>"));
 	} else {
+	    $("#result").show();
 		$("#clearButton").show();
 		var btnTemplate = $("<button>Перейти</button>");
-		$.each(data.items, function(index, value) {
+		$.each(array.items, function(index, value) {
 			var btn = btnTemplate.clone().click(function() {
-				getDocument(value.path.split(" "));
+				getDocument(value.path.split("-"));
 				return false;
 			});
 			var rec = $("<tr/>").append($("<td/>").text(value.name)).append(
@@ -149,11 +166,10 @@ function createResultTable(data) {
 	}
 }
 
+// функция проверки текущего пользователя в базе данных (если вход выполнен верно наделяет его всеми доступными правами)
 function login(data) {
-
 	var array = eval('(' + data + ')');
 	var result = array.result;
-
 	switch (result) {
 	case "noFound":
 		alert("Польователь с таким именем не найден.\n            Проверьте правильность ввода.");
@@ -165,7 +181,7 @@ function login(data) {
 		$("#logIn").hide();
 		$("#logOut").show();
 		$("#welcomeText")
-				.append("Welcome to Docus, <b>" + array.name + "</b>!");
+				.append("Добро пожаловать, <b>" + array.name + "</b>!");
 		сurrentUserRole = array.role;
 		userName = array.name;
 	}
@@ -173,6 +189,7 @@ function login(data) {
 	}
 }
 
+// функция для фильтра доступности полей ввода в зависимости от роли пользователя
 function filterAccessibilityFieldforUser() {
 	switch (сurrentUserRole) {
 	case "unregistered": {
@@ -193,6 +210,7 @@ function filterAccessibilityFieldforUser() {
 	}
 }
 
+// функция для заполнения формы документа используя объект JSON
 function fillOutFormJSON(docInformation) {
 	var doc = eval('(' + docInformation + ')');
 	filterAccessibilityAddDeleteforUser(true, true);
@@ -213,6 +231,7 @@ function fillOutFormJSON(docInformation) {
 	$("#dateChanged").text(doc.modified);
 }
 
+// функция для фильтра доступности кнопок удалить и добавить в зависимости от роли пользователя
 function filterAccessibilityAddDeleteforUser(add, del) {
 	switch (сurrentUserRole) {
 	case "unregistered": {
@@ -228,6 +247,7 @@ function filterAccessibilityAddDeleteforUser(add, del) {
 	}
 }
 
+// функция для фильтра доступности кнопки отправить файл в зависимости от роли пользователя
 function filterAccessibilitySendforUser(send) {
 	switch (сurrentUserRole) {
 	case "unregistered": {
@@ -243,6 +263,7 @@ function filterAccessibilitySendforUser(send) {
 	}
 }
 
+// функция для фильтра доступности кнопки удалить и загузить файл в зависимости от роли пользователя ?
 function filterAccessibilityDownloadRemoveforUser(download, remove) {
 	switch (сurrentUserRole) {
 	case "unregistered": {
@@ -260,6 +281,7 @@ function filterAccessibilityDownloadRemoveforUser(download, remove) {
 	}
 }
 
+// функция для фильтра доступности кнопки отправить файл
 function setButtonsSendFile(send) {
 	$("#linkFile").empty();
 	if (send) {
@@ -272,6 +294,7 @@ function setButtonsSendFile(send) {
 
 }
 
+// функция для фильтра доступности кнопок получить и удалить файл
 function setButtonsDownloadRemove(download, remove) {
 	if (download) {
 		document.docusControl.getFile.disabled = "";
@@ -285,6 +308,7 @@ function setButtonsDownloadRemove(download, remove) {
 	}
 }
 
+// функция для установки доступности кнопок добавить и удалить документ
 function setButtonsAddDelete(add, del) {
 
 	if (add) {
@@ -297,9 +321,9 @@ function setButtonsAddDelete(add, del) {
 	} else {
 		document.docusControl.del.disabled = "disabled";
 	}
-
 }
 
+// функция для установки доступности кнопок удалить, сбросить, отмена
 function setButtonsSaveResetCancel(save, reset, cancel) {
 	if (save) {
 		document.docusControl.save.disabled = "";
@@ -318,6 +342,7 @@ function setButtonsSaveResetCancel(save, reset, cancel) {
 	}
 }
 
+// функция для заполнения полей вновь создаваемого документа
 function newDoc() {
 	document.docusControl.docName.disabled = "";
 	document.docusControl.docAuthor.disabled = "";
@@ -334,6 +359,7 @@ function newDoc() {
 
 }
 
+// функция для заполнения полей корневого элемента дерева документов
 function rootNode() {
 	setButtonsSaveResetCancel(false, false, false);
 	filterAccessibilityAddDeleteforUser(true, false);
@@ -352,8 +378,14 @@ function rootNode() {
 
 }
 
-$(function() {
 
+/*
+Далее идут обработчики событий для каждого элемента на странице
+*/
+
+// JQUERY
+$(function() {
+    // работа с элементами дерева непосредственно в дереве
 	$("#tree-div")
 			.jstree(
 					{
@@ -388,7 +420,7 @@ $(function() {
 						}
 					})
 			.bind("loaded.jstree", function(event, data) {
-
+                // загрузка дерева
 				document.docusControl.docName.disabled = "disabled";
 				document.docusControl.docAuthor.disabled = "disabled";
 				document.docusControl.docTags.disabled = "disabled";
@@ -400,7 +432,7 @@ $(function() {
 			.bind(
 					"select_node.jstree",
 					function(event, data) {
-
+                        // нажатие на элемент дерева
 						lastSelectedDocId = data.rslt.obj.attr("id");
 
 						$
@@ -554,7 +586,6 @@ $(function() {
 				});
 
 			}).bind("move_node.jstree", function(event, data) {
-				alert(data.rslt.p);
 				$.post("/move", {
 					"selectedId" : data.rslt.o.attr("id"),
 					"destinationId" : data.rslt.r.attr("id"),
@@ -566,10 +597,12 @@ $(function() {
 
 			});
 
+    // обработчик события нажатия кнопки Удалить
 	$("#deleteDoc").click(function() {
 		$("#tree-div").jstree("remove");
 	});
 
+    // обработчик события нажатия кнопки Найти
 	$("#findButton").click(function() {
 		if (сurrentUserRole === "unregistered") {
 			return;
@@ -585,6 +618,7 @@ $(function() {
 
 	});
 
+    // обработчик события нажатия кнопки Очистить
 	$("#clearButton").click(function() {
 
 		selectedNodes = unique(selectedNodes);
@@ -595,6 +629,7 @@ $(function() {
 		selectedNodes = [];
 	});
 
+    // обработчик события нажатия кнопки Отправить файл
 	$("#sendfile").click(function() {
 		var path = $('#filepath').val();
 		var currentId = $('#tree-div').jstree('get_selected').attr('id');
@@ -602,6 +637,7 @@ $(function() {
 		$("#formm").submit();
 	});
 
+    // обработчик события нажатия кнопки Войти
 	$("#loginButtonIn").click(function() {
 		$.post("/login", {
 			"login" : document.loginForm.name.value,
@@ -612,12 +648,14 @@ $(function() {
 		});
 	});
 
+    // обработчик события нажатия кнопки Выйти
 	$("#loginButtonOut").click(function() {
 		resetButtons();
 		resetVariables();
 		enterHowUnregistred();
 	});
 
+    // обработчик события нажатия кнопки Получить файл
 	$("#downloadFile").click(
 			function() {
 				var currentId = $('#tree-div').jstree('get_selected')
@@ -628,11 +666,13 @@ $(function() {
 				form.submit();
 			});
 
+    // обработчик события нажатия кнопки Создать
 	$("#createDoc").click(function() {
 		lastEvent = "Create";
 		newDoc();
 	});
 
+    // обработчик события нажатия кнопки Сохранить
 	$("#saveDoc").click(function() {
 		if (checkFields()) {
 			alert("Заполните, пожалуйста, пустые поля.");
@@ -651,6 +691,7 @@ $(function() {
 
 	});
 
+    // обработчик события нажатия кнопки Отмена
 	$("#cancelDoc").click(function() {
 
 		if (lastEvent == "Create") {
@@ -665,6 +706,7 @@ $(function() {
 		}
 	});
 
+    // обработчик события нажатия кнопки Сбросить изменения
 	$("#resetDoc").click(function() {
 		if (lastEvent == "Create") {
 			newDoc();
@@ -675,6 +717,7 @@ $(function() {
 		}
 	});
 
+    // обработчик события нажатия кнопки Удалить файл
 	$("#deleteFile").click(function() {
 		$('#linkFile').empty();
 		var currentId = $('#tree-div').jstree('get_selected').attr('id');
@@ -690,20 +733,27 @@ $(function() {
 
 	});
 
+    // обработчик события изменения текста в поле ввода Имя документа
 	$('#nameDoc').bind('textchange', function(event, previousText) {
 		addOrChange();
 	});
+
+	// обработчик события изменения текста в поле ввода Автор
 	$('#authorDoc').bind('textchange', function(event, previousText) {
 		addOrChange();
 	});
+
+	// обработчик события изменения текста в поле ввода Тэги
 	$('#tagsDoc').bind('textchange', function(event, previousText) {
 		addOrChange();
 	});
 
+    // обработчик события готовности страницы
 	$(document).ready(function() {
 		enterHowUnregistred();
 		resetVariables();
 		$("#clearButton").hide();
+		$("#result").hide();
 		$("#formm").ajaxForm(function(data) {
 			document.docusControl.pathfile.value = "";
 			setButtonsDownloadRemove(true, true);

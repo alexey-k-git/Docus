@@ -116,8 +116,15 @@ public class XMLCreator {
                         saveNodeInDB(currentDocument, gfsDoc, file, docs);
                     }
                     return true;
-                } catch (ParserConfigurationException | SAXException
-                        | IOException e) {
+                } catch (ParserConfigurationException  e) {
+                    e.printStackTrace();
+                }
+                catch (SAXException e)
+                {
+                    e.printStackTrace();
+                }
+                catch (IOException e)
+                {
                     e.printStackTrace();
                 }
             } else

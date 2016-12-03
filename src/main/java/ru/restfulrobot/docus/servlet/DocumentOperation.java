@@ -156,12 +156,19 @@ public class DocumentOperation extends JsonServlet {
             else if (user.getString("password").equals(DocusApplication.encodePassword(password, "DocusForever"))) {
                 StringBuilder role = new StringBuilder();
                 BasicDBList roleList = (BasicDBList) user.get("roles");
-                for (Object o : roleList) {
-                    role.append(o);
+                if (roleList!=null) {
+                    for (Object o : roleList) {
+                        role.append(o);
+                    }
+                    obj.put("role", role.toString());
+                }
+                else
+                {
+                    obj.put("role","admin");
                 }
                 obj.put("result", "Found");
                 obj.put("name", login);
-                obj.put("role", role.toString());
+
             } else {
                 obj.put("result", "passwordError");
             }

@@ -39,7 +39,9 @@ public class WelcomeServlet extends HttpServlet {
             resp.addHeader("Transfer-Encoding", "chunked");
             getWelcomeTemplate().process(values, writer);
             writer.flush();
-        } catch (TemplateException | IOException e) {
+        } catch (TemplateException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -57,6 +59,7 @@ public class WelcomeServlet extends HttpServlet {
     }
 
     private final static Map<String, String> MIME_TYPES = new HashMap<String, String>();
+
     static {
         MIME_TYPES.put("json", "text/css");
         MIME_TYPES.put("css", "text/css");

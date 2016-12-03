@@ -43,7 +43,6 @@ import com.mongodb.util.JSON;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-
 public class DocusServer {
 
     public static void main(String[] args) throws IOException {
@@ -81,8 +80,9 @@ public class DocusServer {
     }
 
     private void childs() {
-
-        Spark.get("/childs", (request, response)-> {
+        Spark.get(new Route("/childs") {
+            @Override
+            public Object handle(Request request, Response response) {
                 response.raw().setContentType("application/json;charset=utf-8");
                 String nodeId = request.queryParams("id");
                 final BasicDBObject query = new BasicDBObject();
@@ -114,12 +114,15 @@ public class DocusServer {
                 }
                 return null;
 
+            }
         });
     }
 
     private void docFind() {
 
-        Spark.post("/find", (request, response)->{
+        Spark.post(new Route("/find") {
+            @Override
+            public Object handle(Request request, Response response) {
 
                 final String typeQuery = request.queryParams("queryType");
                 final String textQuery = request.queryParams("queryText");
@@ -159,11 +162,14 @@ public class DocusServer {
                 }
                 return result;
             }
-        );
+        });
+
     }
 
     private void docShow() {
-        Spark.post("/show", (request, response)->{
+        Spark.post(new Route("/show") {
+            @Override
+            public Object handle(Request request, Response response) {
                 final String currentDocumentId = request.queryParams("id");
                 ObjectId realId = new ObjectId(currentDocumentId);
                 if (DocusRegistry.instance.getDocTree().getMainNode().getId()
@@ -200,12 +206,15 @@ public class DocusServer {
                     e.printStackTrace();
                 }
                 return obj;
-            });
+            }
+        });
 
     }
 
     private void deleteFile() {
-        Spark.post("/deleteFile", (request, response)->{
+        Spark.post(new Route("/deleteFile") {
+            @Override
+            public Object handle(Request request, Response response) {
                 final String currentDocumentId = request.queryParams("id");
                 ObjectId realId = new ObjectId(currentDocumentId);
                 DocTree docTree = DocusRegistry.instance.getDocTree();
@@ -214,11 +223,15 @@ public class DocusServer {
                         DocusRegistry.instance.getGridFS("DocFiles").findOne(
                                 realId));
                 return filename;
-            });
+            }
+        });
+
     }
 
     private void uploadFile() {
-        Spark.post("/upload", (request, response)->{
+        Spark.post(new Route("/upload") {
+            @Override
+            public Object handle(Request request, Response response) {
                 Part filePart = null;
                 System.out.println(request.body());
                 String currentDocumentId = null;
@@ -244,11 +257,15 @@ public class DocusServer {
                 gfsFile.save();
                 currentDoc.setFile(true, "blablabal");
                 return "??";
-            });
+
+            }
+        });
     }
 
     private void downloadFile() {
-        Spark.post("/download", (request, response)->{
+        Spark.post(new Route("/download") {
+            @Override
+            public Object handle(Request request, Response response) {
                 final String currentDocumentId = request.queryParams("id");
                 ObjectId realId = new ObjectId(currentDocumentId);
                 GridFS gfsDoc = DocusRegistry.instance.getGridFS("DocFiles");
@@ -266,12 +283,15 @@ public class DocusServer {
                 response.status(200);
                 return null;
 
-            });
+            }
+        });
     }
 
     private void docCreate() {
 
-        Spark.post("/create", (request, response)->{
+        Spark.post(new Route("/create") {
+            @Override
+            public Object handle(Request request, Response response) {
                 final String parentId = request.queryParams("idParent");
                 ObjectId objectIdParent = new ObjectId(parentId);
                 final String name = request.queryParams("name");
@@ -296,12 +316,15 @@ public class DocusServer {
 
                 return newString;
 
-            });
+            }
+        });
     }
 
     private void docChange() {
 
-        Spark.post("/change",(request, response)->{
+        Spark.post(new Route("/change") {
+            @Override
+            public Object handle(Request request, Response response) {
                 final String docId = request.queryParams("id");
                 ObjectId realId = new ObjectId(docId);
                 final String name = request.queryParams("name");
@@ -322,21 +345,29 @@ public class DocusServer {
                 currentDoc.update();
                 String newString = currentDoc.getId().toString();
                 return newString;
-            });
+            }
+        });
+
     }
 
     private void idCreate() {
 
-        Spark.post("/getnewid",(request, response)->{
+        Spark.post(new Route("/getnewid") {
+            @Override
+            public Object handle(Request request, Response response) {
                 ObjectId id = new ObjectId();
                 return id.toString();
 
-            });
+            }
+        });
+
     }
 
     private void deleteDoc() {
 
-        Spark.post("/delete", (request, response)->{
+        Spark.post(new Route("/delete") {
+            @Override
+            public Object handle(Request request, Response response) {
                 final String currentDocumentId = request.queryParams("id");
                 ObjectId realId = new ObjectId(currentDocumentId);
 
@@ -356,11 +387,16 @@ public class DocusServer {
                         currentDoc.getParent(), positionSelectedDoc - 1);
                 currentDoc.removeFromParent();
                 return "deleted";
-            });
+            }
+        });
+
     }
 
     private void docMove() {
-        Spark.post("/move",(request, response)->{
+
+        Spark.post(new Route("/move") {
+            @Override
+            public Object handle(Request request, Response response) {
                 final String selected = request.queryParams("selectedId");
                 final String destination = request.queryParams("destinationId");
                 final String option = request.queryParams("option");
@@ -425,7 +461,9 @@ public class DocusServer {
                 }
                 return null;
 
-            });
+            }
+        });
+
     }
 
     public static BasicDBObject toDocumentNode(DBObject object) {
@@ -456,7 +494,9 @@ public class DocusServer {
     }
 
     private void addResources() {
-        Spark.get("/js/*",(request, response)->{
+        Spark.get(new Route("/js/*") {
+            @Override
+            public Object handle(Request request, Response response) {
                 String path = request.pathInfo();
                 try {
                     InputStream resource = getResource(path.substring(1));
@@ -474,12 +514,15 @@ public class DocusServer {
                     e.printStackTrace();
                 }
                 return null;
-            });
+            }
+        });
     }
 
     private void addWelcomePage() throws IOException {
         final Template welcome = config.getTemplate("welcome.ftl");
-        Spark.get("/",(request, response)->{
+        Spark.get(new Route("/") {
+            @Override
+            public Object handle(Request request, Response response) {
                 response.header("Content-Type", "text/html;charset=UTF-8");
                 response.header("Transfer-Encoding", "chunked");
                 Map<String, Object> values = new HashMap<String, Object>();
@@ -494,7 +537,9 @@ public class DocusServer {
                     e.printStackTrace();
                 }
                 return null;
-            });
+            }
+
+        });
     }
 
     private InputStream getResource(String resource) {
@@ -539,3 +584,4 @@ public class DocusServer {
 
     }
 }
+

@@ -297,7 +297,7 @@ public class DocusFrame extends JFrame {
                     textTags.setEnabled(false);
                 }
             }
-            ;
+
             break;
 
             default: {

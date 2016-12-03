@@ -120,7 +120,7 @@ public class DocTree {
     public Collection<Document> findByName(String search, String department,
                                            String departments[]) {
         if (!department.equals("reviewers")) {
-            departments = new String[] { department, "general" };
+            departments = new String[]{department, "general"};
         }
         return root.findByName(search, departments);
     }
@@ -137,7 +137,7 @@ public class DocTree {
                                              String departments[]) {
 
         if (!department.equals("reviewers")) {
-            departments = new String[] { department, "general" };
+            departments = new String[]{department, "general"};
         }
         return root.findByAuthor(search, departments);
     }
@@ -152,7 +152,7 @@ public class DocTree {
                                          String departments[]) {
 
         if (!department.equals("reviewers")) {
-            departments = new String[] { department, "general" };
+            departments = new String[]{department, "general"};
         }
         return root.findTags(search, departments);
     }
@@ -204,7 +204,7 @@ public class DocTree {
             }
             BasicDBList tagsList = (BasicDBList) obj.get("tags");
             if (tagsList != null) {
-                for (Iterator<Object> it = tagsList.iterator(); it.hasNext();) {
+                for (Iterator<Object> it = tagsList.iterator(); it.hasNext(); ) {
                     tags.add(String.valueOf(it.next()));
                 }
             }
@@ -632,8 +632,9 @@ public class DocTree {
                 final Iterator<Document> it = childs.iterator();
                 Enumeration<TreeNode> enumer = new Enumeration<TreeNode>() {
                     public boolean hasMoreElements() {
-                       return it.hasNext();
+                        return it.hasNext();
                     }
+
                     public TreeNode nextElement() {
                         return it.next();
                     }

@@ -20,7 +20,9 @@ import com.mongodb.util.JSON;
 
 public class DocumentChildrenServlet extends JsonServlet {
 
-    /** Unique Id */
+    /**
+     * Unique Id
+     */
     private static final long serialVersionUID = 5526714418328894690L;
 
     @Override
@@ -41,8 +43,9 @@ public class DocumentChildrenServlet extends JsonServlet {
                 array.put(object);
             }
             writeJson(array, response);
-        } catch (IOException | JSONException e) {
+        } catch (JSONException e) {
             e.printStackTrace();
+        } catch (IOException e) {
         }
     }
 
